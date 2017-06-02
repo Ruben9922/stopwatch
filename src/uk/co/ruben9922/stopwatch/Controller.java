@@ -5,7 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 
-public class Controller {
+public class Controller { // TODO: refactor so that tabs have own controllers
     @FXML
     private Spinner<Integer> hoursSpinner;
     @FXML
@@ -22,6 +22,10 @@ public class Controller {
     private Button startButton;
     @FXML
     private Button stopButton;
+
+    private int hoursLeft;
+    private int minutesLeft;
+    private int secondsLeft;
 
     public void startButtonAction() {
         startButton.setVisible(false);
@@ -65,5 +69,24 @@ public class Controller {
         hoursLeftLabel.setManaged(false);
         minutesLeftLabel.setManaged(false);
         secondsLeftLabel.setManaged(false);
+    }
+
+    public void update() {
+        if (secondsLeft == 0) {
+            if (minutesLeft == 0) {
+                if (hoursLeft == 0) {
+                    // Timer done
+                } else {
+                    secondsLeft = 59;
+                    minutesLeft = 59;
+                    hoursLeft--;
+                }
+            } else {
+                secondsLeft = 59;
+                minutesLeft--;
+            }
+        } else {
+            secondsLeft--;
+        }
     }
 }
