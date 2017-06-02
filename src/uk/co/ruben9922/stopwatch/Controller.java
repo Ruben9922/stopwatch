@@ -39,23 +39,21 @@ public class Controller { // TODO: refactor so that tabs have own controllers
     }
 
     public void startButtonAction() {
-        if (!running) { // If not already running (i.e. Reset, not Stop, button was last button pressed), reset time left
+        if (!running) { // If not already running (i.e. Reset, not Stop, button was last button pressed), reset time left & update UI
             resetTimeLeft();
+
+            running = true;
+            updateUIState();
+            updateTimeLeftLabels();
         }
 
-        running = true;
-
-        updateUIState();
-
-        updateTimeLeftLabels();
-
-        timeline.play();
+        timeline.play(); // Start/resume timer
     }
 
     public void stopButtonAction() {
         timeline.pause();
 
-        startButton.setVisible(true);
+        startButton.setVisible(true); // TODO: Possibly extract into separate method
         startButton.setManaged(true);
 
         stopButton.setVisible(false);
