@@ -33,7 +33,7 @@ public class Controller { // TODO: refactor so that tabs have own controllers
     private Timeline timeline;
 
     public void startButtonAction() {
-        setUIState(true);
+        updateUIState(true);
 
         hoursLeft = hoursSpinner.getValue();
         minutesLeft = minutesSpinner.getValue();
@@ -45,10 +45,10 @@ public class Controller { // TODO: refactor so that tabs have own controllers
     }
 
     public void stopButtonAction() {
-        setUIState(false);
+        updateUIState(false);
     }
 
-    private void setUIState(boolean timerStarted) {
+    private void updateUIState(boolean timerStarted) {
         startButton.setVisible(!timerStarted);
         startButton.setVisible(!timerStarted);
 
