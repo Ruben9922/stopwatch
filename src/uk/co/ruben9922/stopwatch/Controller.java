@@ -50,10 +50,10 @@ public class Controller { // TODO: refactor so that tabs have own controllers
 
     private void updateUIState(boolean timerStarted) {
         startButton.setVisible(!timerStarted);
-        startButton.setVisible(!timerStarted);
+        startButton.setManaged(!timerStarted);
 
         stopButton.setVisible(timerStarted);
-        stopButton.setVisible(timerStarted);
+        stopButton.setManaged(timerStarted);
 
         hoursSpinner.setVisible(!timerStarted);
         minutesSpinner.setVisible(!timerStarted);
