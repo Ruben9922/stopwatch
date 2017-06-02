@@ -87,14 +87,7 @@ public class Controller { // TODO: refactor so that tabs have own controllers
     private void updateTimeLeft() {
         if (secondsLeft == 0) {
             if (minutesLeft == 0) {
-                if (hoursLeft == 0) {
-                    // Timer is done
-                    // Stop timeline (otherwise this method continues to be run and multiple alerts are shown)
-                    timeline.stop();
-
-                    // Display alert
-                    displayDoneAlert();
-                } else {
+                if (hoursLeft != 0) {
                     secondsLeft = 59;
                     minutesLeft = 59;
                     hoursLeft--;
@@ -105,6 +98,15 @@ public class Controller { // TODO: refactor so that tabs have own controllers
             }
         } else {
             secondsLeft--;
+
+            if (secondsLeft == 0 && minutesLeft == 0 && hoursLeft == 0) {
+                // Timer is done
+                // Stop timeline (otherwise this method continues to be run and multiple alerts are shown)
+                timeline.stop();
+
+                // Display alert
+                displayDoneAlert();
+            }
         }
 
         updateTimeLeftLabels();
