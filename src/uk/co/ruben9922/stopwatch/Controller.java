@@ -2,8 +2,6 @@ package uk.co.ruben9922.stopwatch;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -79,12 +77,7 @@ public class Controller { // TODO: refactor so that tabs have own controllers
 
     private void startTimer() {
         // Using Timeline as Timer doesn't work when changing UI elements
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                updateTimeLeft();
-            }
-        }));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (actionEvent) -> updateTimeLeft()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
