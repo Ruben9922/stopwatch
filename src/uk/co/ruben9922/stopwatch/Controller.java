@@ -46,6 +46,9 @@ public class Controller { // TODO: refactor so that tabs have own controllers
 
     public void stopButtonAction() {
         updateUIState(false);
+
+        // Stop timer
+        timeline.stop();
     }
 
     private void updateUIState(boolean timerStarted) {
