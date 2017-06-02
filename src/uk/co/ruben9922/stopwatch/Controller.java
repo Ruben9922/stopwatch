@@ -3,6 +3,7 @@ package uk.co.ruben9922.stopwatch;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
@@ -29,6 +30,7 @@ public class Controller { // TODO: refactor so that tabs have own controllers
     private int hoursLeft;
     private int minutesLeft;
     private int secondsLeft;
+    private Timeline timeline;
 
     public void startButtonAction() {
         setUIState(true);
@@ -77,7 +79,7 @@ public class Controller { // TODO: refactor so that tabs have own controllers
 
     private void startTimer() {
         // Using Timeline as Timer doesn't work when changing UI elements
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (actionEvent) -> updateTimeLeft()));
+        timeline = new Timeline(new KeyFrame(Duration.seconds(1), (actionEvent) -> updateTimeLeft()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
@@ -86,7 +88,12 @@ public class Controller { // TODO: refactor so that tabs have own controllers
         if (secondsLeft == 0) {
             if (minutesLeft == 0) {
                 if (hoursLeft == 0) {
-                    // Timer done
+                    // Timer is done
+                    // Stop timeline (otherwise this method continues to be run and multiple alerts are shown)
+                    timeline.stop();
+
+                    // Display alert
+                    displayDoneAlert();
                 } else {
                     secondsLeft = 59;
                     minutesLeft = 59;
@@ -101,5 +108,10 @@ public class Controller { // TODO: refactor so that tabs have own controllers
         }
 
         updateTimeLeftLabels();
+    }
+
+    private void displayDoneAlert() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Timer is done!");
+        alert.show();
     }
 }
