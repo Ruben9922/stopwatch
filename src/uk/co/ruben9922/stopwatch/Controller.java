@@ -1,9 +1,14 @@
 package uk.co.ruben9922.stopwatch;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
+import javafx.util.Duration;
 
 public class Controller { // TODO: refactor so that tabs have own controllers
     @FXML
@@ -29,6 +34,14 @@ public class Controller { // TODO: refactor so that tabs have own controllers
 
     public void startButtonAction() {
         setUIState(true);
+
+        hoursLeft = hoursSpinner.getValue();
+        minutesLeft = minutesSpinner.getValue();
+        secondsLeft = secondsSpinner.getValue();
+
+        updateTimeLeftLabels();
+
+        startTimer();
     }
 
     public void stopButtonAction() {
@@ -57,7 +70,26 @@ public class Controller { // TODO: refactor so that tabs have own controllers
         secondsLeftLabel.setManaged(timerStarted);
     }
 
-    public void updateTimeLeft() {
+    private void updateTimeLeftLabels() {
+        // Update labels with time left values
+        hoursLeftLabel.setText(Integer.toString(hoursLeft));
+        minutesLeftLabel.setText(Integer.toString(minutesLeft));
+        secondsLeftLabel.setText(Integer.toString(secondsLeft));
+    }
+
+    private void startTimer() {
+        // Using Timeline as Timer doesn't work when changing UI elements
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                updateTimeLeft();
+            }
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+
+    private void updateTimeLeft() {
         if (secondsLeft == 0) {
             if (minutesLeft == 0) {
                 if (hoursLeft == 0) {
@@ -74,5 +106,7 @@ public class Controller { // TODO: refactor so that tabs have own controllers
         } else {
             secondsLeft--;
         }
+
+        updateTimeLeftLabels();
     }
 }
