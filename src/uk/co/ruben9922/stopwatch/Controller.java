@@ -28,47 +28,33 @@ public class Controller { // TODO: refactor so that tabs have own controllers
     private int secondsLeft;
 
     public void startButtonAction() {
-        startButton.setVisible(false);
-        startButton.setManaged(false);
-
-        stopButton.setVisible(true);
-        stopButton.setManaged(true);
-
-        hoursSpinner.setVisible(false);
-        minutesSpinner.setVisible(false);
-        secondsSpinner.setVisible(false);
-        hoursSpinner.setManaged(false);
-        minutesSpinner.setManaged(false);
-        secondsSpinner.setManaged(false);
-
-        hoursLeftLabel.setVisible(true);
-        minutesLeftLabel.setVisible(true);
-        secondsLeftLabel.setVisible(true);
-        hoursLeftLabel.setManaged(true);
-        minutesLeftLabel.setManaged(true);
-        secondsLeftLabel.setManaged(true);
+        setUIState(true);
     }
 
     public void stopButtonAction() {
-        stopButton.setVisible(false);
-        stopButton.setVisible(false);
+        setUIState(false);
+    }
 
-        startButton.setVisible(true);
-        startButton.setVisible(true);
+    private void setUIState(boolean timerStarted) {
+        startButton.setVisible(!timerStarted);
+        startButton.setVisible(!timerStarted);
 
-        hoursSpinner.setVisible(true);
-        minutesSpinner.setVisible(true);
-        secondsSpinner.setVisible(true);
-        hoursSpinner.setManaged(true);
-        minutesSpinner.setManaged(true);
-        secondsSpinner.setManaged(true);
+        stopButton.setVisible(timerStarted);
+        stopButton.setVisible(timerStarted);
 
-        hoursLeftLabel.setVisible(false);
-        minutesLeftLabel.setVisible(false);
-        secondsLeftLabel.setVisible(false);
-        hoursLeftLabel.setManaged(false);
-        minutesLeftLabel.setManaged(false);
-        secondsLeftLabel.setManaged(false);
+        hoursSpinner.setVisible(!timerStarted);
+        minutesSpinner.setVisible(!timerStarted);
+        secondsSpinner.setVisible(!timerStarted);
+        hoursSpinner.setManaged(!timerStarted);
+        minutesSpinner.setManaged(!timerStarted);
+        secondsSpinner.setManaged(!timerStarted);
+
+        hoursLeftLabel.setVisible(timerStarted);
+        minutesLeftLabel.setVisible(timerStarted);
+        secondsLeftLabel.setVisible(timerStarted);
+        hoursLeftLabel.setManaged(timerStarted);
+        minutesLeftLabel.setManaged(timerStarted);
+        secondsLeftLabel.setManaged(timerStarted);
     }
 
     public void update() {
