@@ -51,13 +51,13 @@ public class Controller { // TODO: refactor so that tabs have own controllers
     }
 
     public void stopButtonAction() {
-        timeline.pause();
-
         startButton.setVisible(true); // TODO: Possibly extract into separate method
         startButton.setManaged(true);
 
         stopButton.setVisible(false);
         stopButton.setManaged(false);
+
+        timeline.pause();
     }
 
     public void resetButtonAction() {
