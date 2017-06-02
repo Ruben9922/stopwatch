@@ -9,7 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.util.Duration;
 
-// TODO: Prevent starting timer on 0h 0m 0s
 public class Controller { // TODO: refactor so that tabs have own controllers
     @FXML
     private Spinner<Integer> hoursSpinner;
@@ -35,7 +34,12 @@ public class Controller { // TODO: refactor so that tabs have own controllers
     private Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (actionEvent) -> updateTimeLeft())); // Using Timeline as Timer doesn't work when changing UI elements
 
     public void initialize() {
+        // Initialisation for Timeline
         timeline.setCycleCount(Timeline.INDEFINITE);
+
+        hoursSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkTimeIsNotZero());
+        minutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkTimeIsNotZero());
+        secondsSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkTimeIsNotZero());
     }
 
     public void startButtonAction() {
@@ -65,6 +69,11 @@ public class Controller { // TODO: refactor so that tabs have own controllers
         updateUIState();
 
         timeline.stop();
+    }
+
+    private void checkTimeIsNotZero() {
+        startButton.setDisable(hoursSpinner.getValue() == 0 && minutesSpinner.getValue() == 0
+                && secondsSpinner.getValue() == 0);
     }
 
     private void updateUIState() {
