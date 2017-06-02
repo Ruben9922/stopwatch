@@ -57,7 +57,7 @@ public class Controller { // TODO: refactor so that tabs have own controllers
         secondsLeftLabel.setManaged(timerStarted);
     }
 
-    public void update() {
+    public void updateTimeLeft() {
         if (secondsLeft == 0) {
             if (minutesLeft == 0) {
                 if (hoursLeft == 0) {
