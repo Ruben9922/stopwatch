@@ -30,7 +30,11 @@ public class Controller { // TODO: refactor so that tabs have own controllers
     private int hoursLeft;
     private int minutesLeft;
     private int secondsLeft;
-    private Timeline timeline;
+    private Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (actionEvent) -> updateTimeLeft())); // Using Timeline as Timer doesn't work when changing UI elements
+
+    public void initialize() {
+        timeline.setCycleCount(Timeline.INDEFINITE);
+    }
 
     public void startButtonAction() {
         updateUIState(true);
@@ -81,9 +85,6 @@ public class Controller { // TODO: refactor so that tabs have own controllers
     }
 
     private void startTimer() {
-        // Using Timeline as Timer doesn't work when changing UI elements
-        timeline = new Timeline(new KeyFrame(Duration.seconds(1), (actionEvent) -> updateTimeLeft()));
-        timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
 
