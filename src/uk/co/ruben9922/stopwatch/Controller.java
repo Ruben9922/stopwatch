@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.util.Duration;
 
+// TODO: Prevent starting timer on 0h 0m 0s
 public class Controller { // TODO: refactor so that tabs have own controllers
     @FXML
     private Spinner<Integer> hoursSpinner;
@@ -30,6 +31,7 @@ public class Controller { // TODO: refactor so that tabs have own controllers
     private int hoursLeft;
     private int minutesLeft;
     private int secondsLeft;
+    private boolean running = false;
     private Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (actionEvent) -> updateTimeLeft())); // Using Timeline as Timer doesn't work when changing UI elements
 
     public void initialize() {
@@ -37,44 +39,57 @@ public class Controller { // TODO: refactor so that tabs have own controllers
     }
 
     public void startButtonAction() {
-        updateUIState(true);
+        if (!running) { // If not already running (i.e. Reset, not Stop, button was last button pressed), reset time left
+            resetTimeLeft();
+        }
 
-        hoursLeft = hoursSpinner.getValue();
-        minutesLeft = minutesSpinner.getValue();
-        secondsLeft = secondsSpinner.getValue();
+        running = true;
+
+        updateUIState();
 
         updateTimeLeftLabels();
 
-        startTimer();
+        timeline.play();
     }
 
     public void stopButtonAction() {
-        updateUIState(false);
+        timeline.pause();
 
-        // Stop timer
+        startButton.setVisible(true);
+        startButton.setManaged(true);
+
+        stopButton.setVisible(false);
+        stopButton.setManaged(false);
+    }
+
+    public void resetButtonAction() {
+        running = false;
+        updateUIState();
+
         timeline.stop();
     }
 
-    private void updateUIState(boolean timerStarted) {
-        startButton.setVisible(!timerStarted);
-        startButton.setManaged(!timerStarted);
+    private void updateUIState() {
+        // "Toggle" UI elements based on whether timer is running
+        startButton.setVisible(!running);
+        startButton.setManaged(!running);
 
-        stopButton.setVisible(timerStarted);
-        stopButton.setManaged(timerStarted);
+        stopButton.setVisible(running);
+        stopButton.setManaged(running);
 
-        hoursSpinner.setVisible(!timerStarted);
-        minutesSpinner.setVisible(!timerStarted);
-        secondsSpinner.setVisible(!timerStarted);
-        hoursSpinner.setManaged(!timerStarted);
-        minutesSpinner.setManaged(!timerStarted);
-        secondsSpinner.setManaged(!timerStarted);
+        hoursSpinner.setVisible(!running);
+        minutesSpinner.setVisible(!running);
+        secondsSpinner.setVisible(!running);
+        hoursSpinner.setManaged(!running);
+        minutesSpinner.setManaged(!running);
+        secondsSpinner.setManaged(!running);
 
-        hoursLeftLabel.setVisible(timerStarted);
-        minutesLeftLabel.setVisible(timerStarted);
-        secondsLeftLabel.setVisible(timerStarted);
-        hoursLeftLabel.setManaged(timerStarted);
-        minutesLeftLabel.setManaged(timerStarted);
-        secondsLeftLabel.setManaged(timerStarted);
+        hoursLeftLabel.setVisible(running);
+        minutesLeftLabel.setVisible(running);
+        secondsLeftLabel.setVisible(running);
+        hoursLeftLabel.setManaged(running);
+        minutesLeftLabel.setManaged(running);
+        secondsLeftLabel.setManaged(running);
     }
 
     private void updateTimeLeftLabels() {
@@ -84,8 +99,10 @@ public class Controller { // TODO: refactor so that tabs have own controllers
         secondsLeftLabel.setText(Integer.toString(secondsLeft));
     }
 
-    private void startTimer() {
-        timeline.play();
+    private void resetTimeLeft() {
+        hoursLeft = hoursSpinner.getValue();
+        minutesLeft = minutesSpinner.getValue();
+        secondsLeft = secondsSpinner.getValue();
     }
 
     private void updateTimeLeft() {
@@ -107,6 +124,10 @@ public class Controller { // TODO: refactor so that tabs have own controllers
                 // Timer is done
                 // Stop timeline (otherwise this method continues to be run and multiple alerts are shown)
                 timeline.stop();
+
+                // "Toggle" UI elements
+                running = false;
+                updateUIState();
 
                 // Display alert
                 displayDoneAlert();

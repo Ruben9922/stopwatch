@@ -67,7 +67,7 @@
                             <buttons>
                                 <Button defaultButton="true" mnemonicParsing="false" onAction="#startButtonAction" text="Start" fx:id="startButton"/>
                                 <Button defaultButton="true" layoutX="75.0" layoutY="12.0" managed="false" mnemonicParsing="false" onAction="#stopButtonAction" text="Stop" visible="false" fx:id="stopButton"/>
-                                <Button cancelButton="true" mnemonicParsing="false" text="Reset"/>
+                                <Button cancelButton="true" mnemonicParsing="false" onAction="#resetButtonAction" text="Reset"/>
                             </buttons>
                         </ButtonBar>
                     </children>
