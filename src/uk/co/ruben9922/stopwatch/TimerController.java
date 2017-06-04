@@ -31,7 +31,7 @@ public class TimerController {
     private int hoursLeft;
     private int minutesLeft;
     private int secondsLeft;
-    private boolean running = false;
+    private boolean started = false;
     private Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (actionEvent) -> updateTimeLeft())); // Using Timeline as Timer doesn't work when changing UI elements
 
     public void initialize() {
@@ -44,35 +44,27 @@ public class TimerController {
     }
 
     public void startButtonAction() {
-        if (!running) { // If not already running (i.e. Reset, not Stop, button was last button pressed), reset time left & update UI
+        if (!started) { // If not already started (i.e. Reset, not Stop, button was last button pressed), reset time left & update UI
             resetTimeLeft();
 
-            running = true;
+            started = true;
             updateUIState();
             updateTimeLeftLabels();
+        } else {
+            updateStartStopButtonState(false);
         }
-
-        startButton.setVisible(false);
-        startButton.setManaged(false);
-
-        stopButton.setVisible(true);
-        stopButton.setManaged(true);
 
         timeline.play(); // Start/resume timer
     }
 
     public void stopButtonAction() {
-        startButton.setVisible(true); // TODO: Possibly extract into separate method
-        startButton.setManaged(true);
-
-        stopButton.setVisible(false);
-        stopButton.setManaged(false);
+        updateStartStopButtonState(true);
 
         timeline.pause();
     }
 
     public void resetButtonAction() {
-        running = false;
+        started = false;
         updateUIState();
 
         timeline.stop();
@@ -83,27 +75,31 @@ public class TimerController {
                 && secondsSpinner.getValue() == 0);
     }
 
+    private void updateStartStopButtonState(boolean running) { // Might change later
+        startButton.setVisible(running);
+        startButton.setManaged(running);
+
+        stopButton.setVisible(!running);
+        stopButton.setManaged(!running);
+    }
+
     private void updateUIState() {
-        // "Toggle" UI elements based on whether timer is running
-        startButton.setVisible(!running);
-        startButton.setManaged(!running);
+        // "Toggle" UI elements based on whether timer has been started
+        updateStartStopButtonState(!started);
 
-        stopButton.setVisible(running);
-        stopButton.setManaged(running);
+        hoursSpinner.setVisible(!started);
+        minutesSpinner.setVisible(!started);
+        secondsSpinner.setVisible(!started);
+        hoursSpinner.setManaged(!started);
+        minutesSpinner.setManaged(!started);
+        secondsSpinner.setManaged(!started);
 
-        hoursSpinner.setVisible(!running);
-        minutesSpinner.setVisible(!running);
-        secondsSpinner.setVisible(!running);
-        hoursSpinner.setManaged(!running);
-        minutesSpinner.setManaged(!running);
-        secondsSpinner.setManaged(!running);
-
-        hoursLeftLabel.setVisible(running);
-        minutesLeftLabel.setVisible(running);
-        secondsLeftLabel.setVisible(running);
-        hoursLeftLabel.setManaged(running);
-        minutesLeftLabel.setManaged(running);
-        secondsLeftLabel.setManaged(running);
+        hoursLeftLabel.setVisible(started);
+        minutesLeftLabel.setVisible(started);
+        secondsLeftLabel.setVisible(started);
+        hoursLeftLabel.setManaged(started);
+        minutesLeftLabel.setManaged(started);
+        secondsLeftLabel.setManaged(started);
     }
 
     private void updateTimeLeftLabels() {
@@ -140,7 +136,7 @@ public class TimerController {
                 timeline.stop();
 
                 // "Toggle" UI elements
-                running = false;
+                started = false;
                 updateUIState();
 
                 // Display alert
