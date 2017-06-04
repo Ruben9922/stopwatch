@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<TabPane xmlns:fx="http://javafx.com/fxml/1" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.111" fx:controller="uk.co.ruben9922.stopwatch.Controller">
+<TabPane xmlns:fx="http://javafx.com/fxml/1" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.111" fx:controller="uk.co.ruben9922.stopwatch.MainController">
     <tabs>
         <Tab text="Timer">
             <content>

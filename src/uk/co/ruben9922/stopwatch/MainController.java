@@ -10,7 +10,7 @@ import javafx.scene.control.Spinner;
 import javafx.util.Duration;
 
 // TODO: Possibly remember last valid values
-public class Controller { // TODO: refactor so that tabs have own controllers
+public class MainController { // TODO: refactor so that tabs have own controllers
     @FXML
     private Spinner<Integer> hoursSpinner;
     @FXML
