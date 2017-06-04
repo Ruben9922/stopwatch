@@ -52,6 +52,12 @@ public class TimerController {
             updateTimeLeftLabels();
         }
 
+        startButton.setVisible(false);
+        startButton.setManaged(false);
+
+        stopButton.setVisible(true);
+        stopButton.setManaged(true);
+
         timeline.play(); // Start/resume timer
     }
 
