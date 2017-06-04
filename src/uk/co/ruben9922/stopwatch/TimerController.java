@@ -12,6 +12,7 @@ import javafx.util.Duration;
 
 // TODO: Possibly remember last valid values
 // TODO: Fix progress bar behaviour on timer finishing
+// TODO: Fix layout when window resized
 public class TimerController {
     @FXML
     private Spinner<Integer> hoursSpinner;
