@@ -10,6 +10,7 @@ import javafx.scene.control.Spinner;
 import javafx.util.Duration;
 
 // TODO: Possibly remember last valid values
+// TODO: Add progress bar
 public class TimerController {
     @FXML
     private Spinner<Integer> hoursSpinner;
