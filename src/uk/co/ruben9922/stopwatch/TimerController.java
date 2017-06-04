@@ -6,11 +6,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Spinner;
 import javafx.util.Duration;
 
 // TODO: Possibly remember last valid values
-// TODO: Add progress bar
+// TODO: Fix progress bar behaviour on timer finishing
 public class TimerController {
     @FXML
     private Spinner<Integer> hoursSpinner;
@@ -28,6 +29,8 @@ public class TimerController {
     private Button startButton;
     @FXML
     private Button stopButton;
+    @FXML
+    private ProgressBar progressBar;
 
     private int hoursLeft;
     private int minutesLeft;
@@ -101,6 +104,8 @@ public class TimerController {
         hoursLeftLabel.setManaged(started);
         minutesLeftLabel.setManaged(started);
         secondsLeftLabel.setManaged(started);
+
+        progressBar.setProgress(0);
     }
 
     private void updateTimeLeftLabels() {
@@ -108,6 +113,14 @@ public class TimerController {
         hoursLeftLabel.setText(Integer.toString(hoursLeft));
         minutesLeftLabel.setText(Integer.toString(minutesLeft));
         secondsLeftLabel.setText(Integer.toString(secondsLeft));
+    }
+
+    private void updateProgressBar() {
+        int totalTimeSeconds = (hoursSpinner.getValue() * 3600) + (minutesSpinner.getValue() * 60) // TODO: Change to use fields
+                + secondsSpinner.getValue();
+        int timeLeftSeconds = (hoursLeft * 3600) + (minutesLeft * 60) + secondsLeft;
+        int timeElapsedSeconds = totalTimeSeconds - timeLeftSeconds;
+        progressBar.setProgress(((double) timeElapsedSeconds / totalTimeSeconds));
     }
 
     private void resetTimeLeft() {
@@ -146,6 +159,7 @@ public class TimerController {
         }
 
         updateTimeLeftLabels();
+        updateProgressBar();
     }
 
     private void displayDoneAlert() {
