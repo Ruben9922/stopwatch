@@ -39,7 +39,7 @@ public class TimerController {
     private int minutesLeft;
     private int secondsLeft;
     private boolean started = false;
-    private Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (actionEvent) -> updateTimeLeft())); // Using Timeline as Timer doesn't work when changing UI elements
+    private Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (actionEvent) -> decrementTimeLeft())); // Using Timeline as Timer doesn't work when changing UI elements
 
     public void initialize() {
         // Initialisation for Timeline
@@ -52,7 +52,7 @@ public class TimerController {
 
     public void startButtonAction() {
         if (!started) { // If not already started (i.e. Reset, not Stop, button was last button pressed), reset time left & update UI
-            resetTimeLeft();
+            updateTimeLeft();
 
             started = true;
             updateUIState();
@@ -126,13 +126,13 @@ public class TimerController {
         progressBar.setProgress(((double) timeElapsedSeconds / totalTimeSeconds));
     }
 
-    private void resetTimeLeft() {
+    private void updateTimeLeft() {
         hoursLeft = hoursSpinner.getValue();
         minutesLeft = minutesSpinner.getValue();
         secondsLeft = secondsSpinner.getValue();
     }
 
-    private void updateTimeLeft() {
+    private void decrementTimeLeft() {
         if (secondsLeft == 0) {
             if (minutesLeft == 0) {
                 if (hoursLeft != 0) {
