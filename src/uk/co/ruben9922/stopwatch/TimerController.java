@@ -2,6 +2,7 @@ package uk.co.ruben9922.stopwatch;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -56,6 +57,7 @@ public class TimerController {
             started = true;
             updateUIState();
             updateTimeLeftLabels();
+            progressBar.setProgress(0);
         } else {
             updateStartStopButtonState(false);
         }
@@ -72,6 +74,7 @@ public class TimerController {
     public void resetButtonAction() {
         started = false;
         updateUIState();
+        progressBar.setProgress(0);
 
         timeline.stop();
     }
@@ -106,8 +109,6 @@ public class TimerController {
         hoursLeftLabel.setManaged(started);
         minutesLeftLabel.setManaged(started);
         secondsLeftLabel.setManaged(started);
-
-        progressBar.setProgress(0);
     }
 
     private void updateTimeLeftLabels() {
@@ -156,7 +157,7 @@ public class TimerController {
                 updateUIState();
 
                 // Display alert
-                displayDoneAlert();
+                Platform.runLater(this::displayDoneAlert);
             }
         }
 
@@ -166,6 +167,7 @@ public class TimerController {
 
     private void displayDoneAlert() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "Timer is done!");
-        alert.show();
+        alert.showAndWait();
+        progressBar.setProgress(0);
     }
 }
