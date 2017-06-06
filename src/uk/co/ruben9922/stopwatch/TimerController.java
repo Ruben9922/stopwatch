@@ -15,6 +15,7 @@ import javafx.util.Duration;
 // TODO: Fix progress bar behaviour on timer finishing
 // TODO: Fix layout when window resized
 // TODO: Optionally play sound when finished
+// TODO: Consider using properties & binding
 public class TimerController {
     @FXML
     private Spinner<Integer> hoursSpinner;
@@ -35,6 +36,9 @@ public class TimerController {
     @FXML
     private ProgressBar progressBar;
 
+    private int totalHours;
+    private int totalMinutes;
+    private int totalSeconds;
     private int hoursLeft;
     private int minutesLeft;
     private int secondsLeft;
@@ -51,7 +55,8 @@ public class TimerController {
     }
 
     public void startButtonAction() {
-        if (!started) { // If not already started (i.e. Reset, not Stop, button was last button pressed), reset time left & update UI
+        if (!started) { // If not already started (i.e. Reset, not Stop, button was last button pressed), update fields & update UI
+            updateTotalTime();
             updateTimeLeft();
 
             started = true;
@@ -119,11 +124,16 @@ public class TimerController {
     }
 
     private void updateProgressBar() {
-        int totalTimeSeconds = (hoursSpinner.getValue() * 3600) + (minutesSpinner.getValue() * 60) // TODO: Change to use fields
-                + secondsSpinner.getValue();
+        int totalTimeSeconds = (totalHours * 3600) + (totalMinutes * 60) + totalSeconds;
         int timeLeftSeconds = (hoursLeft * 3600) + (minutesLeft * 60) + secondsLeft;
         int timeElapsedSeconds = totalTimeSeconds - timeLeftSeconds;
         progressBar.setProgress(((double) timeElapsedSeconds / totalTimeSeconds));
+    }
+
+    private void updateTotalTime() {
+        totalHours = hoursSpinner.getValue();
+        totalMinutes = minutesSpinner.getValue();
+        totalSeconds = secondsSpinner.getValue();
     }
 
     private void updateTimeLeft() {
@@ -132,7 +142,7 @@ public class TimerController {
         secondsLeft = secondsSpinner.getValue();
     }
 
-    private void decrementTimeLeft() {
+    private void decrementTimeLeft() { // Possibly refactor
         if (secondsLeft == 0) {
             if (minutesLeft == 0) {
                 if (hoursLeft != 0) {
