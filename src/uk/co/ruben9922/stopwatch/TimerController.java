@@ -3,6 +3,13 @@ package uk.co.ruben9922.stopwatch;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.NumberBinding;
+import javafx.beans.binding.When;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -12,10 +19,8 @@ import javafx.scene.control.Spinner;
 import javafx.util.Duration;
 
 // TODO: Possibly remember last valid values
-// TODO: Fix progress bar behaviour on timer finishing
 // TODO: Fix layout when window resized
 // TODO: Optionally play sound when finished
-// TODO: Consider using properties & binding
 public class TimerController {
     @FXML
     private Spinner<Integer> hoursSpinner;
@@ -36,148 +41,126 @@ public class TimerController {
     @FXML
     private ProgressBar progressBar;
 
-    private int totalHours;
-    private int totalMinutes;
-    private int totalSeconds;
-    private int hoursLeft;
-    private int minutesLeft;
-    private int secondsLeft;
-    private boolean started = false;
+    private IntegerProperty totalHours = new SimpleIntegerProperty(0);
+    private IntegerProperty totalMinutes = new SimpleIntegerProperty(0);
+    private IntegerProperty totalSeconds = new SimpleIntegerProperty(0);
+    private IntegerProperty hoursLeft = new SimpleIntegerProperty(0);
+    private IntegerProperty minutesLeft = new SimpleIntegerProperty(0);
+    private IntegerProperty secondsLeft = new SimpleIntegerProperty(0);
+    private BooleanProperty started = new SimpleBooleanProperty(false);
+    private BooleanProperty running = new SimpleBooleanProperty(false);
     private Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (actionEvent) -> decrementTimeLeft())); // Using Timeline as Timer doesn't work when changing UI elements
 
     public void initialize() {
         // Initialisation for Timeline
         timeline.setCycleCount(Timeline.INDEFINITE);
 
-        hoursSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkTimeIsNotZero());
-        minutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkTimeIsNotZero());
-        secondsSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkTimeIsNotZero());
+        // Bind visible & managed properties of spinners and labels
+        hoursSpinner.visibleProperty().bind(started.not());
+        minutesSpinner.visibleProperty().bind(started.not());
+        secondsSpinner.visibleProperty().bind(started.not());
+        hoursSpinner.managedProperty().bind(started.not());
+        minutesSpinner.managedProperty().bind(started.not());
+        secondsSpinner.managedProperty().bind(started.not());
+        hoursLeftLabel.visibleProperty().bind(started);
+        minutesLeftLabel.visibleProperty().bind(started);
+        secondsLeftLabel.visibleProperty().bind(started);
+        hoursLeftLabel.managedProperty().bind(started);
+        minutesLeftLabel.managedProperty().bind(started);
+        secondsLeftLabel.managedProperty().bind(started);
+
+        // Bind visible & managed properties of start & stop buttons
+        startButton.visibleProperty().bind(running.not());
+        startButton.managedProperty().bind(running.not());
+        stopButton.visibleProperty().bind(running);
+        stopButton.managedProperty().bind(running);
+
+        // Bind total time fields
+        totalHours.bind(hoursSpinner.valueProperty());
+        totalMinutes.bind(minutesSpinner.valueProperty());
+        totalSeconds.bind(secondsSpinner.valueProperty());
+
+        // Bind time left labels
+        hoursLeftLabel.textProperty().bind(hoursLeft.asString());
+        minutesLeftLabel.textProperty().bind(minutesLeft.asString());
+        secondsLeftLabel.textProperty().bind(secondsLeft.asString());
+
+        // Disable start button when all spinners set to zero
+        BooleanBinding allZero = totalHours.isEqualTo(0).and(totalMinutes.isEqualTo(0)).and(totalSeconds.isEqualTo(0));
+        startButton.disableProperty().bind(allZero);
+
+        // Bind progress bar
+        NumberBinding totalTimeSeconds = totalHours.multiply(3600).add(totalMinutes.multiply(60)).add(totalSeconds);
+        NumberBinding timeLeftSeconds = hoursLeft.multiply(3600).add(minutesLeft.multiply(60)).add(secondsLeft);
+        NumberBinding timeElapsedSeconds = totalTimeSeconds.subtract(timeLeftSeconds);
+        NumberBinding progress = new When(started)
+                .then(timeElapsedSeconds.multiply(1.0).divide(totalTimeSeconds)) // .multiply(1.0) is to force double division
+                .otherwise(0);
+        progressBar.progressProperty().bind(progress);
     }
 
     public void startButtonAction() {
-        if (!started) { // If not already started (i.e. Reset, not Stop, button was last button pressed), update fields & update UI
-            updateTotalTime();
-            updateTimeLeft();
+        if (!started.get()) { // If not already started (i.e. Reset, not Stop, button was last button pressed), reset time left
+            resetTimeLeft();
 
-            started = true;
-            updateUIState();
-            updateTimeLeftLabels();
-            progressBar.setProgress(0);
-        } else {
-            updateStartStopButtonState(false);
+            started.set(true);
         }
+
+        running.set(true);
 
         timeline.play(); // Start/resume timer
     }
 
     public void stopButtonAction() {
-        updateStartStopButtonState(true);
+        running.set(false);
 
         timeline.pause();
     }
 
     public void resetButtonAction() {
-        started = false;
-        updateUIState();
-        progressBar.setProgress(0);
+        started.set(false);
+        running.set(false);
 
         timeline.stop();
     }
 
-    private void checkTimeIsNotZero() {
-        startButton.setDisable(hoursSpinner.getValue() == 0 && minutesSpinner.getValue() == 0
-                && secondsSpinner.getValue() == 0);
-    }
-
-    private void updateStartStopButtonState(boolean running) { // Might change later
-        startButton.setVisible(running);
-        startButton.setManaged(running);
-
-        stopButton.setVisible(!running);
-        stopButton.setManaged(!running);
-    }
-
-    private void updateUIState() {
-        // "Toggle" UI elements based on whether timer has been started
-        updateStartStopButtonState(!started);
-
-        hoursSpinner.setVisible(!started);
-        minutesSpinner.setVisible(!started);
-        secondsSpinner.setVisible(!started);
-        hoursSpinner.setManaged(!started);
-        minutesSpinner.setManaged(!started);
-        secondsSpinner.setManaged(!started);
-
-        hoursLeftLabel.setVisible(started);
-        minutesLeftLabel.setVisible(started);
-        secondsLeftLabel.setVisible(started);
-        hoursLeftLabel.setManaged(started);
-        minutesLeftLabel.setManaged(started);
-        secondsLeftLabel.setManaged(started);
-    }
-
-    private void updateTimeLeftLabels() {
-        // Update labels with time left values
-        hoursLeftLabel.setText(Integer.toString(hoursLeft));
-        minutesLeftLabel.setText(Integer.toString(minutesLeft));
-        secondsLeftLabel.setText(Integer.toString(secondsLeft));
-    }
-
-    private void updateProgressBar() {
-        int totalTimeSeconds = (totalHours * 3600) + (totalMinutes * 60) + totalSeconds;
-        int timeLeftSeconds = (hoursLeft * 3600) + (minutesLeft * 60) + secondsLeft;
-        int timeElapsedSeconds = totalTimeSeconds - timeLeftSeconds;
-        progressBar.setProgress(((double) timeElapsedSeconds / totalTimeSeconds));
-    }
-
-    private void updateTotalTime() {
-        totalHours = hoursSpinner.getValue();
-        totalMinutes = minutesSpinner.getValue();
-        totalSeconds = secondsSpinner.getValue();
-    }
-
-    private void updateTimeLeft() {
-        hoursLeft = hoursSpinner.getValue();
-        minutesLeft = minutesSpinner.getValue();
-        secondsLeft = secondsSpinner.getValue();
+    private void resetTimeLeft() {
+        hoursLeft.set(totalHours.get());
+        minutesLeft.set(totalMinutes.get());
+        secondsLeft.set(totalSeconds.get());
     }
 
     private void decrementTimeLeft() { // Possibly refactor
-        if (secondsLeft == 0) {
-            if (minutesLeft == 0) {
-                if (hoursLeft != 0) {
-                    secondsLeft = 59;
-                    minutesLeft = 59;
-                    hoursLeft--;
+        if (secondsLeft.get() == 0) {
+            if (minutesLeft.get() == 0) {
+                if (hoursLeft.get() != 0) {
+                    secondsLeft.set(59);
+                    minutesLeft.set(59);
+                    hoursLeft.set(hoursLeft.get() - 1);
                 }
             } else {
-                secondsLeft = 59;
-                minutesLeft--;
+                secondsLeft.set(59);
+                minutesLeft.set(minutesLeft.get() - 1);
             }
         } else {
-            secondsLeft--;
+            secondsLeft.set(secondsLeft.get() - 1);
 
-            if (secondsLeft == 0 && minutesLeft == 0 && hoursLeft == 0) {
+            if (secondsLeft.get() == 0 && minutesLeft.get() == 0 && hoursLeft.get() == 0) {
                 // Timer is done
-                // Stop timeline (otherwise this method continues to be run and multiple alerts are shown)
-                timeline.stop();
+                timeline.stop(); // Stop timeline (otherwise this method continues to be run and multiple alerts are shown)
 
-                // "Toggle" UI elements
-                started = false;
-                updateUIState();
+                Platform.runLater(() -> {
+                    displayDoneAlert(); // Display alert
 
-                // Display alert
-                Platform.runLater(this::displayDoneAlert);
+                    started.set(false);
+                    running.set(false);
+                });
             }
         }
-
-        updateTimeLeftLabels();
-        updateProgressBar();
     }
 
     private void displayDoneAlert() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "Timer is done!");
         alert.showAndWait();
-        progressBar.setProgress(0);
     }
 }
