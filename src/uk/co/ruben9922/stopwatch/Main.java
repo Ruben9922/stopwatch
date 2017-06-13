@@ -16,6 +16,7 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
         primaryStage.setTitle("Stopwatch");
         primaryStage.setScene(new Scene(root));
+        primaryStage.setResizable(false); // Will probably change later
         primaryStage.show();
     }
 }
