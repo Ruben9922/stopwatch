@@ -49,6 +49,7 @@ public class TimerController {
     private IntegerProperty secondsLeft = new SimpleIntegerProperty(0);
     private BooleanProperty started = new SimpleBooleanProperty(false);
     private BooleanProperty running = new SimpleBooleanProperty(false);
+    private BooleanBinding timeLeftAllZero = hoursLeft.isEqualTo(0).and(minutesLeft.isEqualTo(0)).and(secondsLeft.isEqualTo(0));
     private Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (actionEvent) -> decrementTimeLeft())); // Using Timeline as Timer doesn't work when changing UI elements
 
     public void initialize() {
@@ -97,6 +98,21 @@ public class TimerController {
                 .then(timeElapsedSeconds.multiply(1.0).divide(totalTimeSeconds)) // .multiply(1.0) is to force double division
                 .otherwise(0);
         progressBar.progressProperty().bind(progress);
+
+        // Add listener for time running out
+        timeLeftAllZero.addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                // Timer is done
+                timeline.stop(); // Stop timeline (otherwise this method continues to be run and multiple alerts are shown)
+
+                Platform.runLater(() -> {
+                    displayDoneAlert(); // Display alert
+
+                    started.set(false);
+                    running.set(false);
+                });
+            }
+        });
     }
 
     public void startButtonAction() {
@@ -130,7 +146,7 @@ public class TimerController {
         secondsLeft.set(totalSeconds.get());
     }
 
-    private void decrementTimeLeft() { // Possibly refactor
+    private void decrementTimeLeft() {
         if (secondsLeft.get() == 0) {
             if (minutesLeft.get() == 0) {
                 if (hoursLeft.get() != 0) {
@@ -144,18 +160,6 @@ public class TimerController {
             }
         } else {
             secondsLeft.set(secondsLeft.get() - 1);
-
-            if (secondsLeft.get() == 0 && minutesLeft.get() == 0 && hoursLeft.get() == 0) {
-                // Timer is done
-                timeline.stop(); // Stop timeline (otherwise this method continues to be run and multiple alerts are shown)
-
-                Platform.runLater(() -> {
-                    displayDoneAlert(); // Display alert
-
-                    started.set(false);
-                    running.set(false);
-                });
-            }
         }
     }
 
